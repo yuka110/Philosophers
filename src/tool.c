@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 20:22:06 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/10/31 21:08:46 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/01 21:33:31 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,5 +44,9 @@ void	ft_freedata(t_data *data)
 	// free(data->time_eat);
 	// free(data->time_sleep);
 	// free(data->mealnum);
+	// if (data->mutex)
+	// 	free (data->mutex);
+	if (data->philo)
+		free (data->philo);
 	free(data);
 }
