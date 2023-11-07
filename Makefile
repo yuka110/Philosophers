@@ -6,7 +6,7 @@
 #    By: yitoh <yitoh@student.codam.nl>               +#+                      #
 #                                                    +#+                       #
 #    Created: 2023/10/31 19:35:41 by yitoh         #+#    #+#                  #
-#    Updated: 2023/11/01 20:44:18 by yitoh         ########   odam.nl          #
+#    Updated: 2023/11/07 18:19:22 by yitoh         ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,6 +15,8 @@ CC		=cc
 CFLAGS	=-Wall -Werror -Wextra -g -fsanitize=address
 RM		=rm -f
 SRC		=src/main.c\
+		 src/init.c\
+		 src/test.c\
 		 src/tool.c
 OBJ		=$(SRC:src/%.c=obj/%.o)
 
