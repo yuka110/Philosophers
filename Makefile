@@ -6,13 +6,13 @@
 #    By: yitoh <yitoh@student.codam.nl>               +#+                      #
 #                                                    +#+                       #
 #    Created: 2023/10/31 19:35:41 by yitoh         #+#    #+#                  #
-#    Updated: 2023/11/07 18:19:22 by yitoh         ########   odam.nl          #
+#    Updated: 2023/11/13 18:08:56 by yitoh         ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	=philo
 CC		=cc
-CFLAGS	=-Wall -Werror -Wextra -g -fsanitize=address
+CFLAGS	=-Wall -Werror -Wextra -g -fsanitize=thread
 RM		=rm -f
 SRC		=src/main.c\
 		 src/init.c\

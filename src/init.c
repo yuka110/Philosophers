@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/11/07 18:12:40 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/07 18:35:00 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/13 19:26:04 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,14 @@ void	ft_initmutex(t_data *data)
 		ft_freedata(data);
 		return ;
 	}
-	pthread_mutex_init(&data->mutex.lock, NULL);
+	pthread_mutex_init(&data->writing, NULL);
+	pthread_mutex_init(&data->start, NULL);
 	while (i < data->pnum)
 	{
 		pthread_mutex_init(&data->chopstick[i], NULL);
 		pthread_mutex_init(&data->pdata[i].plock, NULL);
+		data->pdata[i].id = i;
+		data->pdata[i].data = data;
 		i++;
 	}
 
@@ -41,9 +44,9 @@ t_data	*ft_parsing(int ac, char **av)
 	if (!data)
 		return (NULL);
 	data->pnum = ft_atoiplus(av[1]);
-	data->time_die = ft_atoiplus(av[2]);
-	data->time_eat = ft_atoiplus(av[3]);
-	data->time_sleep = ft_atoiplus(av[4]);
+	data->time_die = ft_atoiplus(av[2]) * 1000;
+	data->time_eat = ft_atoiplus(av[3]) * 1000;
+	data->time_sleep = ft_atoiplus(av[4]) * 1000;
 	if (ac == 6)
 		data->mealnum = ft_atoiplus(av[5]);
 	data->philo = (pthread_t *)ft_calloc(sizeof(pthread_t), data->pnum);
@@ -54,12 +57,11 @@ t_data	*ft_parsing(int ac, char **av)
 		ft_freedata(data);
 		return (NULL);
 	}
-	data->mutex.count = 0;
 	ft_initmutex(data);
 	printf("\e[1;35mphilo num = %d\e[0;00m\n", data->pnum);
-	printf("\e[1;35mtime die = %d\e[0;00m\n", data->time_die);
-	printf("\e[1;35mtime eat = %d\e[0;00m\n", data->time_eat);
-	printf("\e[1;35mtime sleep = %d\e[0;00m\n", data->time_sleep);
+	printf("\e[1;35mtime die = %ld\e[0;00m\n", data->time_die);
+	printf("\e[1;35mtime eat = %ld\e[0;00m\n", data->time_eat);
+	printf("\e[1;35mtime sleep = %ld\e[0;00m\n", data->time_sleep);
 	printf("\e[1;35mmeal num= %d\e[0;00m\n", data->mealnum);
 	return (data);
 }

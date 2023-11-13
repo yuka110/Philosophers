@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 20:22:06 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/07 18:33:39 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/13 19:21:53 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,8 @@ void	ft_cleanup(t_data *data)
 	int	i;
 
 	i = 0;
-	pthread_mutex_destroy(&data->mutex.lock);
+	pthread_mutex_destroy(&data->writing);
+	pthread_mutex_destroy(&data->start);
 	while (i < data->pnum)
 	{
 		pthread_mutex_destroy(&data->chopstick[i]);
@@ -74,4 +75,28 @@ void	ft_cleanup(t_data *data)
 		i++;
 	}
 	ft_freedata(data);
+}
+
+long	ft_gettime(t_data *data)
+{
+	struct timeval	time;
+	long			microsec;
+
+	if (gettimeofday(&time, NULL) < 0)
+		return (-1);
+	microsec = time.tv_sec * 1000000 + time.tv_usec - data->s_time;
+	return (microsec);
+}
+
+void	ft_printmsg(t_philo *pdata, char *msg, int eat)
+{
+	unsigned long	time;
+
+	pthread_mutex_lock(&pdata->data->writing);
+	time = ft_gettime(pdata->data) / 1000;
+	printf ("%ld %d ", time, pdata->id);
+	printf ("%s\n", msg);
+	if (eat == 1)
+		pdata->last_eat = time;
+	pthread_mutex_unlock(&pdata->data->writing);
 }

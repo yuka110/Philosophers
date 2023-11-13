@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 19:34:50 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/07 18:31:58 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/13 19:25:40 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,34 +20,37 @@
 # include <string.h>
 # include <pthread.h>
 # include <errno.h>
+# include <sys/time.h>
 
 //Structs
-typedef struct s_mutex
-{
-	// pthread_mutex_t	r_fork;
-	// pthread_mutex_t	l_fork;
-	pthread_mutex_t	lock;
-	int				count;
-}	t_mutex;
+
+typedef struct	s_data	t_data;
 
 typedef struct s_philo
 {
+	int				id;
 	pthread_mutex_t	plock;
 	int				status;
+	long			last_eat;
 	int				eatcnt;
+	t_data			*data;
 }	t_philo;
 
 typedef struct s_data
 {
 	int				pnum;
-	int				time_die;
-	int				time_eat;
-	int				time_sleep;
+	long			time_die;
+	long			time_eat;
+	long			time_sleep;
 	int				mealnum;
+	int				dead;
+	int				finished;
+	long			s_time;
 	pthread_t		*philo;
 	pthread_mutex_t	*chopstick;
+	pthread_mutex_t	writing;
+	pthread_mutex_t	start;
 	t_philo			*pdata;
-	t_mutex			mutex;
 }	t_data;
 
 //main
@@ -60,8 +63,10 @@ void	*ft_calloc(size_t count, size_t size);
 int		ft_atoiplus(const char *str);
 void	ft_freedata(t_data *data);
 void	ft_cleanup(t_data *data);
+long	ft_gettime(t_data *data);
+void	ft_printmsg(t_philo *philo, char *msg, int eat);
 
 //test
-void	*ft_test(void *arg);
+// void	*ft_test(void *arg);
 
 #endif
