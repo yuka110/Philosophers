@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 20:22:06 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/13 19:21:53 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/14 21:50:49 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,17 +61,31 @@ void	ft_freedata(t_data *data)
 	free(data);
 }
 
+void	ft_nophilo(t_data *data)
+{
+	int	i;
+
+	i = 0;
+	while (i < data->pnum)
+	{
+		pthread_mutex_destroy(&data->pdata[i].plock);
+		i++;
+	}
+	free (data->philo);
+}
+
 void	ft_cleanup(t_data *data)
 {
 	int	i;
 
 	i = 0;
+	ft_nophilo(data);
 	pthread_mutex_destroy(&data->writing);
 	pthread_mutex_destroy(&data->start);
+	pthread_mutex_destroy(&data->datalock);
 	while (i < data->pnum)
 	{
 		pthread_mutex_destroy(&data->chopstick[i]);
-		pthread_mutex_destroy(&data->pdata[i].plock);
 		i++;
 	}
 	ft_freedata(data);
@@ -88,10 +102,12 @@ long	ft_gettime(t_data *data)
 	return (microsec);
 }
 
-void	ft_printmsg(t_philo *pdata, char *msg, int eat)
+int	ft_printmsg(t_philo *pdata, char *msg, int eat)
 {
 	unsigned long	time;
 
+	if (ft_selfcheck(pdata))
+		return (1);
 	pthread_mutex_lock(&pdata->data->writing);
 	time = ft_gettime(pdata->data) / 1000;
 	printf ("%ld %d ", time, pdata->id);
@@ -99,4 +115,5 @@ void	ft_printmsg(t_philo *pdata, char *msg, int eat)
 	if (eat == 1)
 		pdata->last_eat = time;
 	pthread_mutex_unlock(&pdata->data->writing);
+	return (0);
 }

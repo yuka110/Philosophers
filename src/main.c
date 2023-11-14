@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 19:41:05 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/13 19:41:19 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/14 21:54:23 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,28 +18,95 @@
 // if only one philo, then she just needs to die because there are no two chopsticks
 // each philo also check their own status
 
+/*
+./philo 3 300 400 500
+
+0 0 is thinking
+0 0 has taken a fork
+0 1 is thinking
+0 2 is thinking
+0 2 has taken a fork
+^C
+
+*/
+
+int	ft_dying(t_philo *pdata)
+{
+	int		dead;
+	t_data	*cpy;
+
+	dead = pdata->id;
+	cpy = pdata->data;
+	ft_cleanup(cpy);
+	printf ("%ld %d died\n", ft_gettime(cpy) / 1000, dead);
+	return (1);
+}
+
+int	ft_selfcheck(t_philo *pdata)
+{
+	pthread_mutex_lock(&pdata->data->pdata[pdata->id].plock);
+	if (ft_gettime(pdata->data) > pdata->last_eat + pdata->data->time_die)
+	{
+		pthread_mutex_unlock(&pdata->data->pdata[pdata->id].plock);
+		return (ft_dying(pdata));
+	}
+	pthread_mutex_unlock(&pdata->data->pdata[pdata->id].plock);
+	return (0);
+}
+
 void	ft_eating(t_philo *pdata)
 {
-	if (pdata->id % 2)
+	if (pdata->id % 2 && !ft_selfcheck(pdata))
 		usleep (500);
-	pthread_mutex_lock(&pdata->data->chopstick[pdata->id]);
-	pthread_mutex_lock(&pdata->data->chopstick[pdata->id + 1]);
-	pthread_mutex_lock(&pdata->data->pdata[pdata->id].plock);
-	ft_printmsg(pdata, "is eating", 1);
-	usleep (pdata->data->time_eat);
-	pdata->last_eat = ft_gettime(pdata->data);
-	pdata->eatcnt++;
+	if (pdata->id == pdata->data->pnum - 1)
+	{
+		pthread_mutex_lock(&pdata->data->chopstick[pdata->id + 1]);
+		if (ft_printmsg(pdata, "has taken a fork", 0))
+			return ;
+		pthread_mutex_lock(&pdata->data->chopstick[pdata->id]);
+		pthread_mutex_lock(&pdata->data->pdata[pdata->id].plock);
+		if (ft_printmsg(pdata, "is eating", 1))
+			return ;
+		usleep (pdata->data->time_eat);
+		pdata->last_eat = ft_gettime(pdata->data);
+		pdata->eatcnt++;
 
-	pthread_mutex_unlock(&pdata->plock);
-	pthread_mutex_unlock(&pdata->data->chopstick[pdata->id + 1]);
-	pthread_mutex_unlock(&pdata->data->chopstick[pdata->id]);
+		pthread_mutex_unlock(&pdata->plock);
+		pthread_mutex_unlock(&pdata->data->chopstick[pdata->id]);
+		pthread_mutex_unlock(&pdata->data->chopstick[pdata->id + 1]);
+	}
+	else 
+	{
+		pthread_mutex_lock(&pdata->data->chopstick[pdata->id]);
+		if (ft_printmsg(pdata, "has taken a fork", 0))
+			return ;
+		pthread_mutex_lock(&pdata->data->chopstick[pdata->id + 1]);
+		pthread_mutex_lock(&pdata->data->pdata[pdata->id].plock);
+		if (ft_printmsg(pdata, "is eating", 1))
+		 	return ;
+		usleep (pdata->data->time_eat);
+		pdata->last_eat = ft_gettime(pdata->data);
+		pdata->eatcnt++;
+
+		pthread_mutex_unlock(&pdata->plock);
+		pthread_mutex_unlock(&pdata->data->chopstick[pdata->id + 1]);
+		pthread_mutex_unlock(&pdata->data->chopstick[pdata->id]);
+	}
 
 }
 
 void	ft_sleeping(t_philo *pdata)
 {
-	ft_printmsg(pdata, "is sleeping", 0);
-	usleep(pdata->data->time_sleep);
+	long	sleep;
+
+	sleep = 0;
+	if (ft_printmsg(pdata, "is sleeping", 0))
+		return ;
+	while (sleep < pdata->data->time_sleep && !ft_selfcheck(pdata))
+	{
+		usleep(500);
+		sleep += 500;
+	}
 }
 
 void	*ft_routine(void *arg)
@@ -49,19 +116,17 @@ void	*ft_routine(void *arg)
 	pdata = (t_philo *)arg;
 	pthread_mutex_lock(&pdata->data->start);
 	pthread_mutex_unlock(&pdata->data->start);
-	ft_printmsg(pdata, "is thinking", 0);
+	if (ft_printmsg(pdata, "is thinking", 0))
+		return (NULL);
 	ft_eating(pdata);
 	ft_sleeping(pdata);
 	return (NULL);
 }
 
-
 // int		ft_monitor()
 // {
 
 // }
-
-
 
 int main(int argc, char **argv)
 {
@@ -83,12 +148,16 @@ int main(int argc, char **argv)
 	}
 	data->s_time = ft_gettime(data);
 	pthread_mutex_unlock(&data->start);
-	id = 0;
-	while (id < data->pnum)
+	if (data)
 	{
-		pthread_join(data->philo[id], NULL);
-		id++;
+		id = 0;
+		while (id < data->pnum)
+		{
+			pthread_join(data->philo[id], NULL);
+			id++;
+		}
+		ft_cleanup(data);
 	}
-	ft_cleanup(data);
+	free (data);
 	return (0);
 }

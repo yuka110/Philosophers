@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 19:34:50 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/13 19:25:40 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/14 21:50:36 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ typedef struct s_data
 	int				dead;
 	int				finished;
 	long			s_time;
+	pthread_mutex_t	datalock;//new
 	pthread_t		*philo;
 	pthread_mutex_t	*chopstick;
 	pthread_mutex_t	writing;
@@ -54,6 +55,7 @@ typedef struct s_data
 }	t_data;
 
 //main
+int	ft_selfcheck(t_philo *pdata);
 
 //init
 t_data	*ft_parsing(int ac, char **av);
@@ -64,7 +66,7 @@ int		ft_atoiplus(const char *str);
 void	ft_freedata(t_data *data);
 void	ft_cleanup(t_data *data);
 long	ft_gettime(t_data *data);
-void	ft_printmsg(t_philo *philo, char *msg, int eat);
+int	ft_printmsg(t_philo *philo, char *msg, int eat);
 
 //test
 // void	*ft_test(void *arg);
