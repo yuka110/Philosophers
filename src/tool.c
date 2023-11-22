@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 20:22:06 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/14 21:50:49 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/22 19:36:14 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void	ft_freedata(t_data *data)
 		free (data->pdata);
 	if (data->chopstick)
 		free (data->chopstick);
-	free(data);
+	// free(data);
 }
 
 void	ft_nophilo(t_data *data)
@@ -68,6 +68,8 @@ void	ft_nophilo(t_data *data)
 	i = 0;
 	while (i < data->pnum)
 	{
+		pthread_mutex_lock(&data->pdata[i].plock);
+		pthread_mutex_unlock(&data->pdata[i].plock);
 		pthread_mutex_destroy(&data->pdata[i].plock);
 		i++;
 	}
@@ -79,16 +81,23 @@ void	ft_cleanup(t_data *data)
 	int	i;
 
 	i = 0;
+	pthread_mutex_lock(&data->dlock);
 	ft_nophilo(data);
+	pthread_mutex_lock(&data->writing);
+	pthread_mutex_unlock(&data->writing);
 	pthread_mutex_destroy(&data->writing);
+	pthread_mutex_lock(&data->start);
+	pthread_mutex_unlock(&data->start);
 	pthread_mutex_destroy(&data->start);
-	pthread_mutex_destroy(&data->datalock);
 	while (i < data->pnum)
 	{
+		pthread_mutex_lock(&data->chopstick[i]);
+		pthread_mutex_unlock(&data->chopstick[i]);
 		pthread_mutex_destroy(&data->chopstick[i]);
 		i++;
 	}
 	ft_freedata(data);
+	pthread_mutex_unlock(&data->dlock);
 }
 
 long	ft_gettime(t_data *data)
