@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 19:41:05 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/22 19:29:36 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/23 19:11:13 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,9 +39,9 @@ int	ft_dying(t_philo *pdata)
 	cpy = pdata->data;
 	pthread_mutex_lock(&cpy->dlock);
 	cpy->dead = 1;
-	pthread_mutex_unlock(&cpy->dlock);
 	ft_cleanup(cpy);
 	printf ("%ld %d died\n", ft_gettime(cpy) / 1000, dead);
+	pthread_mutex_unlock(&cpy->dlock);
 	return (1);
 }
 
@@ -53,7 +53,6 @@ int	ft_selfcheck(t_philo *pdata)
 		pthread_mutex_unlock(&pdata->data->dlock);
 		return (ft_dying(pdata));
 	}
-	pthread_mutex_unlock(&pdata->data->dlock);
 	pthread_mutex_lock(&pdata->data->pdata[pdata->id].plock);
 	if (ft_gettime(pdata->data) > pdata->last_eat + pdata->data->time_die)
 	{
@@ -61,6 +60,7 @@ int	ft_selfcheck(t_philo *pdata)
 		return (ft_dying(pdata));
 	}
 	pthread_mutex_unlock(&pdata->data->pdata[pdata->id].plock);
+	pthread_mutex_unlock(&pdata->data->dlock);
 	return (0);
 }
 
@@ -87,10 +87,13 @@ void	*ft_routine(void *arg)
 	pdata = (t_philo *)arg;
 	pthread_mutex_lock(&pdata->data->start);
 	pthread_mutex_unlock(&pdata->data->start);
-	if (ft_printmsg(pdata, "is thinking", 0))
-		return (NULL);
-	ft_eating(pdata);
-	ft_sleeping(pdata);
+	while (!ft_selfcheck(pdata))
+	{
+		if (ft_printmsg(pdata, "is thinking", 0))
+			return (NULL);
+		ft_eating(pdata);
+		ft_sleeping(pdata);
+	}
 	return (NULL);
 }
 
@@ -114,7 +117,7 @@ int main(int argc, char **argv)
 	while (id < data->pnum)
 	{
 		pthread_create(&data->philo[id], NULL, ft_routine, &data->pdata[id]);
-		printf("\e[1;36mPhilo%d is created\e[0;00m\n", id);
+		printf("\e[1;36mPhilo%d is created: right %d left %d\e[0;00m\n", id, data->pdata[id].r_chop, data->pdata[id].l_chop);
 		id++;
 	}
 	data->s_time = ft_gettime(data);
@@ -127,7 +130,9 @@ int main(int argc, char **argv)
 			pthread_join(data->philo[id], NULL);
 			id++;
 		}
+		pthread_mutex_lock(&data->dlock);
 		ft_cleanup(data);
+		pthread_mutex_unlock(&data->dlock);
 	}
 	pthread_mutex_destroy(&data->dlock);
 	free (data);

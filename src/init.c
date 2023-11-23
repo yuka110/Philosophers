@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/11/07 18:12:40 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/22 19:23:45 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/23 18:18:27 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,10 @@
 void	ft_initmutex(t_data *data)
 {
 	int	i;
+	int	tmp;
 
 	i = 0;
-	data->chopstick = (pthread_mutex_t *)ft_calloc(sizeof(pthread_mutex_t), data->pnum);
+	data->chopstick = ft_calloc(sizeof(pthread_mutex_t), data->pnum);
 	if (!data->chopstick)
 	{
 		ft_freedata(data);
@@ -32,6 +33,16 @@ void	ft_initmutex(t_data *data)
 		pthread_mutex_init(&data->pdata[i].plock, NULL);
 		data->pdata[i].id = i;
 		data->pdata[i].data = data;
+		data->pdata[i].r_chop = i;
+		data->pdata[i].l_chop = i + 1;
+		if (i == data->pnum - 1)
+			data->pdata[i].l_chop = 0;
+		if (!(i % 2))
+		{
+			tmp = data->pdata[i].r_chop;
+			data->pdata[i].r_chop = data->pdata[i].l_chop;
+			data->pdata[i].l_chop = tmp;
+		}
 		i++;
 	}
 
@@ -41,7 +52,7 @@ t_data	*ft_parsing(int ac, char **av)
 {
 	t_data	*data;
 
-	data = (t_data *)ft_calloc(1, sizeof(t_data));
+	data = ft_calloc(1, sizeof(t_data));
 	if (!data)
 		return (NULL);
 	data->pnum = ft_atoiplus(av[1]);
@@ -52,8 +63,8 @@ t_data	*ft_parsing(int ac, char **av)
 		data->mealnum = ft_atoiplus(av[5]);
 	data->philo = (pthread_t *)ft_calloc(sizeof(pthread_t), data->pnum);
 	data->pdata = (t_philo *)ft_calloc(sizeof(t_philo), data->pnum);
-	if (data->pnum < 1 || data->time_die < 1 || data->time_eat < 1 ||
-		data->time_sleep < 1 || (ac == 6 && data->mealnum < 1) || !data->philo)
+	if (data->pnum < 1 || data->time_die < 1 || data->time_eat < 1
+		|| data->time_sleep < 1 || (ac == 6 && data->mealnum < 1) || !data->philo)
 	{
 		ft_freedata(data);
 		return (NULL);
