@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 19:41:05 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/23 19:11:13 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/26 11:45:31 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@
 0 2 has taken a fork
 ^C
 
+T2 is trying to eat while T0 is dying
+
 */
 
 int	ft_dying(t_philo *pdata)
@@ -36,12 +38,12 @@ int	ft_dying(t_philo *pdata)
 	t_data	*cpy;
 
 	dead = pdata->id;
+	pthread_mutex_lock(&pdata->data->dlock);
+	pdata->data->dead = 1;
 	cpy = pdata->data;
-	pthread_mutex_lock(&cpy->dlock);
-	cpy->dead = 1;
+	pthread_mutex_unlock(&pdata->data->dlock);
 	ft_cleanup(cpy);
 	printf ("%ld %d died\n", ft_gettime(cpy) / 1000, dead);
-	pthread_mutex_unlock(&cpy->dlock);
 	return (1);
 }
 
@@ -57,6 +59,7 @@ int	ft_selfcheck(t_philo *pdata)
 	if (ft_gettime(pdata->data) > pdata->last_eat + pdata->data->time_die)
 	{
 		pthread_mutex_unlock(&pdata->data->pdata[pdata->id].plock);
+		pthread_mutex_unlock(&pdata->data->dlock);
 		return (ft_dying(pdata));
 	}
 	pthread_mutex_unlock(&pdata->data->pdata[pdata->id].plock);
@@ -122,19 +125,18 @@ int main(int argc, char **argv)
 	}
 	data->s_time = ft_gettime(data);
 	pthread_mutex_unlock(&data->start);
-	if (data)
+	id = 0;
+	while (id < data->pnum)
 	{
-		id = 0;
-		while (id < data->pnum)
-		{
-			pthread_join(data->philo[id], NULL);
-			id++;
-		}
-		pthread_mutex_lock(&data->dlock);
-		ft_cleanup(data);
-		pthread_mutex_unlock(&data->dlock);
+		pthread_join(data->philo[id], NULL);
+		id++;
 	}
+	pthread_mutex_lock(&data->dlock);
+	if (!data->dead)
+		ft_cleanup(data);
+	pthread_mutex_unlock(&data->dlock);
 	pthread_mutex_destroy(&data->dlock);
+	ft_frechop(data);
 	free (data);
 	return (0);
 }

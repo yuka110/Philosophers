@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 19:34:50 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/23 18:00:05 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/26 11:38:33 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ void	ft_eating(t_philo *pdata);
 void	*ft_calloc(size_t count, size_t size);
 int		ft_atoiplus(const char *str);
 void	ft_freedata(t_data *data);
+void	ft_frechop(t_data *data);
 void	ft_cleanup(t_data *data);
 long	ft_gettime(t_data *data);
 int		ft_printmsg(t_philo *philo, char *msg, int eat);
