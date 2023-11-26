@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 20:22:06 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/26 11:45:30 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/26 19:09:41 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,10 +94,9 @@ void	ft_frechop(t_data *data)
 
 void	ft_cleanup(t_data *data)
 {
-	// int	i;
+	int	i;
 
-	// i = 0;
-	pthread_mutex_lock(&data->dlock);
+	i = 0;
 	ft_nophilo(data);
 	pthread_mutex_lock(&data->writing);
 	pthread_mutex_unlock(&data->writing);
@@ -112,6 +111,7 @@ void	ft_cleanup(t_data *data)
 	// 	pthread_mutex_destroy(&data->chopstick[i]);
 	// 	i++;
 	// }
+	pthread_mutex_lock(&data->dlock);
 	ft_freedata(data);
 	pthread_mutex_unlock(&data->dlock);
 }
