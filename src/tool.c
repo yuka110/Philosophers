@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 20:22:06 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/26 19:09:41 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/27 21:01:25 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,12 +52,12 @@ int	ft_atoiplus(const char *str)
 
 void	ft_freedata(t_data *data)
 {
-	if (data->philo)
-		free (data->philo);
+	// if (data->philo)
+	// 	free (data->philo);
 	if (data->pdata)
 		free (data->pdata);
-	// if (data->chopstick)
-	// 	free (data->chopstick);
+	if (data->chopstick)
+		free (data->chopstick);
 	// free(data);
 }
 
@@ -104,14 +104,15 @@ void	ft_cleanup(t_data *data)
 	pthread_mutex_lock(&data->start);
 	pthread_mutex_unlock(&data->start);
 	pthread_mutex_destroy(&data->start);
-	// while (i < data->pnum)
-	// {
-	// 	pthread_mutex_lock(&data->chopstick[i]);
-	// 	pthread_mutex_unlock(&data->chopstick[i]);
-	// 	pthread_mutex_destroy(&data->chopstick[i]);
-	// 	i++;
-	// }
 	pthread_mutex_lock(&data->dlock);
+	while (i < data->pnum)
+	{
+		printf ("wait for chop\n");
+		pthread_mutex_lock(&data->chopstick[i]);
+		pthread_mutex_unlock(&data->chopstick[i]);
+		pthread_mutex_destroy(&data->chopstick[i]);
+		i++;
+	}
 	ft_freedata(data);
 	pthread_mutex_unlock(&data->dlock);
 }

@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 19:41:05 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/26 19:09:51 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/27 21:22:04 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,15 +55,15 @@ int	ft_selfcheck(t_philo *pdata)
 		pthread_mutex_unlock(&pdata->data->deadlock);
 		return (ft_dying(pdata));
 	}
+	pthread_mutex_unlock(&pdata->data->deadlock);
 	pthread_mutex_lock(&pdata->data->pdata[pdata->id].plock);
 	if (ft_gettime(pdata->data) > pdata->last_eat + pdata->data->time_die)
 	{
 		pthread_mutex_unlock(&pdata->data->pdata[pdata->id].plock);
-		pthread_mutex_unlock(&pdata->data->deadlock);
 		return (ft_dying(pdata));
 	}
 	pthread_mutex_unlock(&pdata->data->pdata[pdata->id].plock);
-	pthread_mutex_unlock(&pdata->data->deadlock);
+	// pthread_mutex_unlock(&pdata->data->deadlock);
 	return (0);
 }
 
@@ -105,10 +105,32 @@ void	*ft_routine(void *arg)
 	return (NULL);
 }
 
-// int		ft_monitor()
-// {
+//dounika suru
+void	*ft_monitor(void *arg)
+{
+	t_data	*data;
+	int		i;
 
-// }
+	i = 0;
+	data = (t_data *)arg;
+	pthread_mutex_lock(&data->deadlock);
+	if (data->dead)
+	{
+		pthread_mutex_unlock(&data->deadlock);
+		return (ft_dying(data.pdata[i]));
+	}
+	pthread_mutex_unlock(&data->deadlock);
+	pthread_mutex_lock(&data->pdata[i].plock);
+	if (ft_gettime(data) > data->pdata[i].last_eat + data->time_die)
+	{
+		pthread_mutex_unlock(&data->pdata[i].plock);
+		return (ft_dying(data.pdata[i]));
+	}
+	pthread_mutex_unlock(&data->pdata[i].plock);
+	// pthread_mutex_unlock(&pdata->data->deadlock);
+	return (0);
+
+}
 
 int main(int argc, char **argv)
 {
@@ -128,8 +150,12 @@ int main(int argc, char **argv)
 		printf("\e[1;36mPhilo%d is created: right %d left %d\e[0;00m\n", id, data->pdata[id].r_chop, data->pdata[id].l_chop);
 		id++;
 	}
+	pthread_create(&data->monitor, NULL, ft_monitor, &data);
 	data->s_time = ft_gettime(data);
 	pthread_mutex_unlock(&data->start);
+	
+	
+	
 	id = 0;
 	while (id < data->pnum)
 	{
@@ -138,10 +164,15 @@ int main(int argc, char **argv)
 	}
 	pthread_mutex_lock(&data->deadlock);
 	if (!data->dead)
+	{
 		ft_cleanup(data);
-	pthread_mutex_unlock(&data->deadlock);
-	pthread_mutex_destroy(&data->deadlock);
-	ft_frechop(data);
+		pthread_mutex_unlock(&data->deadlock);
+	}
+	else
+		pthread_mutex_destroy(&data->deadlock);
+	// ft_frechop(data);
+	if (data->philo)
+		free (data->philo);
 	free (data);
 	return (0);
 }

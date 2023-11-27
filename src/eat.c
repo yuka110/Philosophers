@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/11/22 18:53:50 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/26 19:03:16 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/27 20:57:03 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,14 @@ int	ft_eating(t_philo *pdata)
 		return (1);
 	if (pdata->eatcnt || (!(pdata->id % 2)))
 		usleep (300 * pdata->data->pnum);
-	pthread_mutex_lock(&pdata->data->chopstick[pdata->r_chop]);
-	if (ft_printmsg(pdata, "has taken a fork", 0))
+	if (!pdata || ft_selfcheck(pdata))
 		return (1);
+	pthread_mutex_lock(&pdata->data->chopstick[pdata->r_chop]);
+	if (ft_printmsg(pdata, "has taken a fork", 0) || !pdata || ft_selfcheck(pdata))
+	{
+		pthread_mutex_unlock(&pdata->data->chopstick[pdata->r_chop]);
+		return (1);
+	}
 	pthread_mutex_lock(&pdata->data->chopstick[pdata->l_chop]);
 	if (ft_mealtime(pdata))
 	{
@@ -51,7 +56,6 @@ int	ft_eating(t_philo *pdata)
 		pthread_mutex_unlock(&pdata->data->chopstick[pdata->r_chop]);
 		return (1);
 	}
-	ft_printmsg(pdata, "ahhhh", 0);
 	pthread_mutex_lock(&pdata->plock);
 	pdata->last_eat = ft_gettime(pdata->data);
 	pdata->eatcnt++;
