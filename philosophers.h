@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 19:34:50 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/26 19:09:45 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/28 18:14:26 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,10 @@ typedef struct s_data
 	int				dead;
 	int				finished;
 	long			s_time;
-	pthread_mutex_t	dlock;
-	// pthread_mutex_t	eatlock;
-	pthread_mutex_t	deadlock;
 	pthread_t		*philo;
+	pthread_t		monitor;
+	pthread_mutex_t	dlock;
+	pthread_mutex_t	deadlock;
 	pthread_mutex_t	*chopstick;
 	pthread_mutex_t	writing;
 	pthread_mutex_t	start;

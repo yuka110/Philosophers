@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/11/22 18:53:50 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/27 20:57:03 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/28 18:52:49 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,7 @@ int	ft_mealtime(t_philo *pdata)
 		eat += 500;
 		if (eat >= pdata->data->time_eat)
 			break ;
-		// stuck here
-		// ft_printmsg(pdata, "loooooooooooooooooop", 0);
 	}
-	printf ("GOOD\n");
 	return (0);
 }
 

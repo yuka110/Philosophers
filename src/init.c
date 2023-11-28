@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/11/07 18:12:40 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/26 19:09:49 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/28 21:36:24 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,10 @@ void	ft_initmutex(t_data *data)
 		ft_freedata(data);
 		return ;
 	}
+	pthread_mutex_init(&data->deadlock, NULL);
 	pthread_mutex_init(&data->writing, NULL);
 	pthread_mutex_init(&data->start, NULL);
 	pthread_mutex_init(&data->dlock, NULL);
-	pthread_mutex_init(&data->deadlock, NULL);
 	while (i < data->pnum)
 	{
 		pthread_mutex_init(&data->chopstick[i], NULL);
