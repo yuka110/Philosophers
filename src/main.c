@@ -6,54 +6,26 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 19:41:05 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/30 19:48:56 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/30 20:55:45 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philosophers.h"
 
-
-// if only one philo, then she just needs to die because there are no two chopsticks
-
-
-int	ft_selfcheck(t_philo *pdata)
+int	ft_alone(t_philo *pdata, int pnum)
 {
-	pthread_mutex_lock(&pdata->data->deadlock);
-	if (pdata->data->dead)
+	if (pnum > 1)
+		return (0);
+	pthread_mutex_lock(&pdata->data->chopstick[pdata->r_chop]);
+	if (ft_selfcheck(pdata) || ft_printmsg(pdata, "has taken a fork", 0))
 	{
-		pthread_mutex_unlock(&pdata->data->deadlock);
+		pthread_mutex_unlock(&pdata->data->chopstick[pdata->r_chop]);
 		return (1);
 	}
-	pthread_mutex_lock(&pdata->plock);
-	if (ft_gettime(pdata->data) > pdata->last_eat + pdata->data->time_die)
-	{
-		pthread_mutex_unlock(&pdata->plock);
-		pdata->data->dead = pdata->id + 1;
-		pthread_mutex_unlock(&pdata->data->deadlock);
-		return (1);
-	}
-	pthread_mutex_unlock(&pdata->plock);
-	pthread_mutex_unlock(&pdata->data->deadlock);
-	return (0);
-}
-
-int	ft_sleeping(t_philo *pdata)
-{
-	long	sleep;
-
-	sleep = 0;
-	if (!pdata || ft_selfcheck(pdata))
-		return (1);
-	if (ft_printmsg(pdata, "is sleeping", 0))
-		return (1);
-	while (sleep < pdata->data->time_sleep)
-	{
-		if (ft_selfcheck(pdata))
-			return (1);
+	while (!ft_selfcheck(pdata))
 		usleep(500);
-		sleep += 500;
-	}
-	return (0);
+	pthread_mutex_unlock(&pdata->data->chopstick[pdata->r_chop]);
+	return (1);
 }
 
 void	*ft_routine(void *arg)
@@ -63,6 +35,8 @@ void	*ft_routine(void *arg)
 	pdata = (t_philo *)arg;
 	pthread_mutex_lock(&pdata->data->start);
 	pthread_mutex_unlock(&pdata->data->start);
+	if (ft_alone(pdata, pdata->data->pnum))
+		return (NULL);
 	while (!ft_selfcheck(pdata))
 	{
 		if (ft_printmsg(pdata, "is thinking", 0))
@@ -88,13 +62,22 @@ void	*ft_monitor(void *arg)
 		if (data->dead)
 		{
 			pthread_mutex_unlock(&data->deadlock);
+			pthread_mutex_lock(&data->writing);
+			printf ("%ld %d died\n", ft_gettime(data) / 1000, data->dead - 1);
+			pthread_mutex_unlock(&data->writing);
 			break ;
 		}
+		pthread_mutex_lock(&data->dlock);
+		if (data->finished == data->pnum)
+		{
+			data->dead = 1;
+			pthread_mutex_unlock(&data->dlock);
+			pthread_mutex_unlock(&data->deadlock);
+			break ;
+		}
+		pthread_mutex_unlock(&data->dlock);
 		pthread_mutex_unlock(&data->deadlock);
 	}
-	pthread_mutex_lock(&data->writing);
-	printf ("%ld %d died\n", ft_gettime(data) / 1000, data->dead - 1);
-	pthread_mutex_unlock(&data->writing);
 	return (0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 20:22:06 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/30 18:38:26 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/11/30 19:57:10 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,35 +50,6 @@ int	ft_atoiplus(const char *str)
 	return (num);
 }
 
-void	ft_freedata(t_data *data)
-{
-	if (data->philo)
-		free (data->philo);
-	if (data->pdata)
-		free (data->pdata);
-	if (data->chopstick)
-		free (data->chopstick);
-	free(data);
-}
-
-void	ft_cleanup(t_data *data)
-{
-	int	i;
-
-	i = 0;
-	while (i < data->pnum)
-	{
-		pthread_mutex_destroy(&data->pdata[i].plock);
-		pthread_mutex_destroy(&data->chopstick[i]);
-		i++;
-	}
-	pthread_mutex_destroy(&data->writing);
-	pthread_mutex_destroy(&data->start);
-	pthread_mutex_destroy(&data->deadlock);
-	pthread_mutex_destroy(&data->dlock);
-	ft_freedata(data);
-}
-
 long	ft_gettime(t_data *data)
 {
 	struct timeval	time;
@@ -102,7 +73,10 @@ int	ft_printmsg(t_philo *pdata, char *msg, int eat)
 	printf ("%s\n", msg);
 	pthread_mutex_unlock(&pdata->data->writing);
 	if (eat == 1)
+	{
+		pthread_mutex_lock(&pdata->plock);
 		pdata->last_eat = time;
-	// last_eat needs to be protected
+		pthread_mutex_unlock(&pdata->plock);
+	}
 	return (0);
 }

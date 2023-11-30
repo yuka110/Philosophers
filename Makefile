@@ -6,7 +6,7 @@
 #    By: yitoh <yitoh@student.codam.nl>               +#+                      #
 #                                                    +#+                       #
 #    Created: 2023/10/31 19:35:41 by yitoh         #+#    #+#                  #
-#    Updated: 2023/11/22 18:54:54 by yitoh         ########   odam.nl          #
+#    Updated: 2023/11/30 19:59:05 by yitoh         ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,8 @@ CFLAGS	=-Wall -Werror -Wextra -g -fsanitize=thread
 RM		=rm -f
 SRC		=src/main.c\
 		 src/init.c\
-		 src/eat.c\
+		 src/philo_action.c\
+		 src/cleanup.c\
 		 src/tool.c
 OBJ		=$(SRC:src/%.c=obj/%.o)
 
