@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 19:41:05 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/11/30 20:55:45 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/02 21:21:19 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,12 @@ int	ft_alone(t_philo *pdata, int pnum)
 	if (pnum > 1)
 		return (0);
 	pthread_mutex_lock(&pdata->data->chopstick[pdata->r_chop]);
-	if (ft_selfcheck(pdata) || ft_printmsg(pdata, "has taken a fork", 0))
+	if (ft_selfcheck(pdata, 0) || ft_printmsg(pdata, "has taken a fork", 0))
 	{
 		pthread_mutex_unlock(&pdata->data->chopstick[pdata->r_chop]);
 		return (1);
 	}
-	while (!ft_selfcheck(pdata))
+	while (!ft_selfcheck(pdata, 0))
 		usleep(500);
 	pthread_mutex_unlock(&pdata->data->chopstick[pdata->r_chop]);
 	return (1);
@@ -37,7 +37,7 @@ void	*ft_routine(void *arg)
 	pthread_mutex_unlock(&pdata->data->start);
 	if (ft_alone(pdata, pdata->data->pnum))
 		return (NULL);
-	while (!ft_selfcheck(pdata))
+	while (!ft_selfcheck(pdata, 0))
 	{
 		if (ft_printmsg(pdata, "is thinking", 0))
 			return (NULL);
@@ -63,7 +63,7 @@ void	*ft_monitor(void *arg)
 		{
 			pthread_mutex_unlock(&data->deadlock);
 			pthread_mutex_lock(&data->writing);
-			printf ("%ld %d died\n", ft_gettime(data) / 1000, data->dead - 1);
+			printf ("%ld %d died\n", ft_gettime(data) / 1000, data->dead);
 			pthread_mutex_unlock(&data->writing);
 			break ;
 		}
