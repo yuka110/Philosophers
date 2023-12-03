@@ -6,12 +6,13 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 19:41:05 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/12/02 21:21:19 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/03 15:09:28 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philosophers.h"
-
+// 4 311 150 150
+// max 200
 int	ft_alone(t_philo *pdata, int pnum)
 {
 	if (pnum > 1)
@@ -37,14 +38,18 @@ void	*ft_routine(void *arg)
 	pthread_mutex_unlock(&pdata->data->start);
 	if (ft_alone(pdata, pdata->data->pnum))
 		return (NULL);
+	if (ft_printmsg(pdata, "is thinking", 0))
+		return (NULL);
+	if ( !(pdata->id % 2))
+		usleep (500);
 	while (!ft_selfcheck(pdata, 0))
 	{
-		if (ft_printmsg(pdata, "is thinking", 0))
-			return (NULL);
 		if (ft_eating(pdata))
 			break ;
 		if (ft_sleeping(pdata))
 			break ;
+		if (ft_printmsg(pdata, "is thinking", 0))
+			return (NULL);
 	}
 	return (NULL);
 }

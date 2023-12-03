@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/11/22 18:53:50 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/12/02 21:24:40 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/03 15:06:27 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,10 @@ void	ft_starving(t_philo *pdata, int id)
 	pthread_mutex_unlock(&pdata->data->pdata[neighbor].plock);
 	pthread_mutex_lock(&pdata->plock);
 	if (pdata->last_eat > hungry)
-		usleep (300);
+	{
+		// printf("---------------------------------------\n");
+		usleep (500);
+	}
 	pthread_mutex_unlock(&pdata->plock);
 	return ;
 }
@@ -80,8 +83,8 @@ int	ft_eating(t_philo *pdata)
 {
 	// if (ft_selfcheck(pdata, 0))
 	// 	return (1);
-	// if (pdata->eatcnt || (!(pdata->id % 2)))
-	// 	usleep (300 * pdata->data->pnum);
+	// if (!pdata->eatcnt && (!(pdata->id % 2)))
+	// 	usleep (300);
 	if (!pdata || ft_selfcheck(pdata, 0))
 		return (1);
 	pthread_mutex_lock(&pdata->data->chopstick[pdata->r_chop]);

@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/11/07 18:12:40 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/12/02 21:05:43 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/03 14:45:24 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ t_data	*ft_parsing(int ac, char **av)
 		data->mealnum = ft_atoiplus(av[5]);
 	data->philo = (pthread_t *)ft_calloc(sizeof(pthread_t), data->pnum);
 	data->pdata = (t_philo *)ft_calloc(sizeof(t_philo), data->pnum);
-	if (data->pnum < 1 || data->time_die < 1 || data->time_eat < 1
+	if (data->pnum < 1 || data->pnum > 60000 || data->time_die < 1 || data->time_eat < 1
 		|| data->time_sleep < 1 || (ac == 6 && data->mealnum < 1) || !data->philo)
 	{
 		ft_freedata(data);
