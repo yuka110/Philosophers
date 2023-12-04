@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 19:34:50 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/12/02 20:43:32 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/04 20:55:07 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ typedef struct s_philo
 	int				r_chop;
 	int				l_chop;
 	t_data			*data;
-	// int				status;
 }	t_philo;
 
 typedef struct s_data
@@ -47,7 +46,6 @@ typedef struct s_data
 	int				mealnum;
 	int				dead;
 	int				finished;
-	int				*dirty_chop;
 	long			s_time;
 	pthread_t		*philo;
 	pthread_t		monitor;

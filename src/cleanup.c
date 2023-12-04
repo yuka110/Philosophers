@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/11/03 18:00:10 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/12/02 21:05:53 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/04 20:54:54 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,6 @@ void	ft_freedata(t_data *data)
 		free (data->pdata);
 	if (data->chopstick)
 		free (data->chopstick);
-	// if (data->dirty_chop)
-	// 	free (data->dirty_chop);
 	free(data);
 }
 

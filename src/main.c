@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 19:41:05 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/12/03 15:09:28 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/04 20:58:19 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	*ft_routine(void *arg)
 		return (NULL);
 	if (ft_printmsg(pdata, "is thinking", 0))
 		return (NULL);
-	if ( !(pdata->id % 2))
+	if (!(pdata->id % 2))
 		usleep (500);
 	while (!ft_selfcheck(pdata, 0))
 	{
@@ -75,8 +75,8 @@ void	*ft_monitor(void *arg)
 		pthread_mutex_lock(&data->dlock);
 		if (data->finished == data->pnum)
 		{
-			data->dead = 1;
 			pthread_mutex_unlock(&data->dlock);
+			data->dead = 1;
 			pthread_mutex_unlock(&data->deadlock);
 			break ;
 		}
