@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/11/22 18:53:50 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/12/04 21:03:16 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/06 20:51:11 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,8 +93,8 @@ int	ft_eating(t_philo *pdata)
 		return (1);
 	if (ft_starving(pdata->data, pdata))
 		return (1);
-	// should die while waiting for the lock
 	pthread_mutex_lock(&pdata->data->chopstick[pdata->r_chop]);
+
 	if (!pdata || ft_selfcheck(pdata, 0) || ft_printmsg(pdata, "has taken a fork", 0))
 	{
 		pthread_mutex_unlock(&pdata->data->chopstick[pdata->r_chop]);
