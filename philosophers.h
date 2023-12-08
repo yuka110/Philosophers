@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 19:34:50 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/12/04 20:55:07 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/08 18:45:59 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,8 @@ typedef struct	s_data	t_data;
 typedef struct s_philo
 {
 	int				id;
-	pthread_mutex_t	plock;
+	pthread_mutex_t	cntlock;
+	pthread_mutex_t	l_eatlock;
 	long			last_eat;
 	int				eatcnt;
 	int				r_chop;

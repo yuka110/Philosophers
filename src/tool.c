@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 20:22:06 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/12/02 19:59:45 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/08 18:50:24 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,9 +74,9 @@ int	ft_printmsg(t_philo *pdata, char *msg, int eat)
 	pthread_mutex_unlock(&pdata->data->writing);
 	if (eat == 1)
 	{
-		pthread_mutex_lock(&pdata->plock);
+		pthread_mutex_lock(&pdata->l_eatlock);
 		pdata->last_eat = time;
-		pthread_mutex_unlock(&pdata->plock);
+		pthread_mutex_unlock(&pdata->l_eatlock);
 	}
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 19:41:05 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/12/06 19:51:09 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/08 22:43:50 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ void	*ft_routine(void *arg)
 	if (ft_printmsg(pdata, "is thinking", 0))
 		return (NULL);
 	if (!(pdata->id % 2))
-		usleep (500);
+		usleep (500 * pdata->data->pnum);
 	while (!ft_selfcheck(pdata, 0))
 	{
 		if (ft_eating(pdata))
@@ -54,22 +54,51 @@ void	*ft_routine(void *arg)
 	return (NULL);
 }
 
+int	ft_monitorphilo(t_data *data)
+{
+	int	i;
+	int	curr;
+
+	i = 0;
+	while (i < data->pnum)
+	{
+		// if (!(i % 5))
+		curr = ft_gettime(data);
+		pthread_mutex_lock(&data->pdata[i].l_eatlock);
+		if (curr > data->pdata[i].last_eat + data->time_die)
+		{
+			pthread_mutex_unlock(&data->pdata[i].l_eatlock);
+			pthread_mutex_lock(&data->deadlock);
+			data->dead = data->pdata[i].id + 1;
+			pthread_mutex_lock(&data->writing);
+			printf ("%ld %d died\n", ft_gettime(data) / 1000, data->dead);
+			pthread_mutex_unlock(&data->writing);
+			pthread_mutex_unlock(&data->deadlock);
+			return (1);
+		}
+		pthread_mutex_unlock(&data->pdata[i].l_eatlock);
+		i++;
+	}
+	return (0);
+}
+
+
 void	*ft_monitor(void *arg)
 {
 	t_data	*data;
-	int		i;
 
-	i = 0;
 	data = (t_data *)arg;
+	pthread_mutex_lock(&data->start);
+	pthread_mutex_unlock(&data->start);
 	while (1)
 	{
 		pthread_mutex_lock(&data->deadlock);
 		if (data->dead)
 		{
-			pthread_mutex_unlock(&data->deadlock);
 			pthread_mutex_lock(&data->writing);
 			printf ("%ld %d died\n", ft_gettime(data) / 1000, data->dead);
 			pthread_mutex_unlock(&data->writing);
+			pthread_mutex_unlock(&data->deadlock);
 			break ;
 		}
 		pthread_mutex_lock(&data->dlock);
@@ -82,6 +111,8 @@ void	*ft_monitor(void *arg)
 		}
 		pthread_mutex_unlock(&data->dlock);
 		pthread_mutex_unlock(&data->deadlock);
+		if (ft_monitorphilo(data))
+			break ;
 	}
 	return (0);
 }
@@ -101,7 +132,7 @@ int main(int argc, char **argv)
 	while (id < data->pnum)
 	{
 		pthread_create(&data->philo[id], NULL, ft_routine, &data->pdata[id]);
-		printf("\e[1;36mPhilo%d is created: right %d left %d\e[0;00m\n", id, data->pdata[id].r_chop, data->pdata[id].l_chop);
+		// printf("\e[1;36mPhilo%d is created: right %d left %d\e[0;00m\n", id, data->pdata[id].r_chop, data->pdata[id].l_chop);
 		id++;
 	}
 	pthread_create(&data->monitor, NULL, ft_monitor, data);

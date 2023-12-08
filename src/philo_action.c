@@ -6,12 +6,12 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/11/22 18:53:50 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/12/06 20:51:11 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/08 22:45:57 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philosophers.h"
-
+// make ft_hypersleep to see if the addtime makes difference
 int	ft_selfcheck(t_philo *pdata, int eat)
 {
 	pthread_mutex_lock(&pdata->data->deadlock);
@@ -20,37 +20,49 @@ int	ft_selfcheck(t_philo *pdata, int eat)
 		pthread_mutex_unlock(&pdata->data->deadlock);
 		return (1);
 	}
-	pthread_mutex_lock(&pdata->plock);
-	if (!eat && ft_gettime(pdata->data) > pdata->last_eat + pdata->data->time_die)
-	{
-		pthread_mutex_unlock(&pdata->plock);
-		pdata->data->dead = pdata->id + 1;
-		pthread_mutex_unlock(&pdata->data->deadlock);
-		return (1);
-	}
-	pthread_mutex_unlock(&pdata->plock);
 	pthread_mutex_unlock(&pdata->data->deadlock);
+	if (!eat)
+	{
+		pthread_mutex_lock(&pdata->l_eatlock);
+		if (ft_gettime(pdata->data) > pdata->last_eat + pdata->data->time_die)
+		{
+			pthread_mutex_unlock(&pdata->l_eatlock);
+			pthread_mutex_lock(&pdata->data->deadlock);
+			pdata->data->dead = pdata->id + 1;
+			pthread_mutex_unlock(&pdata->data->deadlock);
+			return (1);
+		}
+		pthread_mutex_unlock(&pdata->l_eatlock);
+	}
 	return (0);
 }
 
 int	ft_mealtime(t_philo *pdata)
 {
-	long	eat;
+	long	eating;
 
-	eat = 0;
 	if (!pdata || ft_selfcheck(pdata, 0))
 		return (1);
-	pthread_mutex_lock(&pdata->plock);
-	pdata->eatcnt++;
-	pdata->last_eat = ft_gettime(pdata->data);
-	pthread_mutex_unlock(&pdata->plock);
 	if (ft_printmsg(pdata, "is eating", 0))
 		return (1);
+	pthread_mutex_lock(&pdata->l_eatlock);
+	pdata->last_eat = ft_gettime(pdata->data);
+	pthread_mutex_unlock(&pdata->l_eatlock);
+	pthread_mutex_lock(&pdata->cntlock);
+	pdata->eatcnt++;
+	if (pdata->data->mealnum > -1 && pdata->eatcnt == pdata->data->mealnum)
+	{
+		pthread_mutex_lock(&pdata->data->dlock);
+		pdata->data->finished++;
+		pthread_mutex_unlock(&pdata->data->dlock);
+	}
+	pthread_mutex_unlock(&pdata->cntlock);
+	eating = 0;
 	while (1)
 	{
 		usleep(500);
-		eat += 590;
-		if (eat >= pdata->data->time_eat)
+		eating += 500 + (pdata->data->pnum * 20);
+		if (eating >= pdata->data->time_eat)
 			break ;
 		if (ft_selfcheck(pdata, 1))
 			return (1);
@@ -63,19 +75,21 @@ int	ft_starving(t_data *data, t_philo *pdata)
 	int		cycle;
 	long	time_left;
 
-	if (data->pnum < 5)
+	if (data->pnum < 3)
 		return (0);
-	pthread_mutex_lock(&pdata->plock);
+	pthread_mutex_lock(&pdata->cntlock);
 	if (!pdata->eatcnt)
 	{
-		pthread_mutex_unlock(&pdata->plock);
+		pthread_mutex_unlock(&pdata->cntlock);
 		return (0);
 	}
+	pthread_mutex_unlock(&pdata->cntlock);
 	cycle = data->time_eat;
 	if (data->pnum % 2)
 		cycle = cycle * 2;
-	time_left = data->time_die - (ft_gettime(data) - pdata->last_eat);
-	pthread_mutex_unlock(&pdata->plock);
+	pthread_mutex_lock(&pdata->l_eatlock);
+	time_left = ft_gettime(data) - pdata->last_eat + data->time_die;
+	pthread_mutex_unlock(&pdata->l_eatlock);
 	while (time_left < cycle)
 	{
 		usleep (500);
@@ -83,6 +97,8 @@ int	ft_starving(t_data *data, t_philo *pdata)
 		if (ft_selfcheck(pdata, 0))
 			return (1);
 	}
+	if (data->pnum % 2 && pdata->id % 2)
+		usleep (data->time_eat / 2);
 	return (0);
 }
 
@@ -94,7 +110,6 @@ int	ft_eating(t_philo *pdata)
 	if (ft_starving(pdata->data, pdata))
 		return (1);
 	pthread_mutex_lock(&pdata->data->chopstick[pdata->r_chop]);
-
 	if (!pdata || ft_selfcheck(pdata, 0) || ft_printmsg(pdata, "has taken a fork", 0))
 	{
 		pthread_mutex_unlock(&pdata->data->chopstick[pdata->r_chop]);
@@ -109,12 +124,6 @@ int	ft_eating(t_philo *pdata)
 	}
 	pthread_mutex_unlock(&pdata->data->chopstick[pdata->l_chop]);
 	pthread_mutex_unlock(&pdata->data->chopstick[pdata->r_chop]);
-	pthread_mutex_lock(&pdata->plock);
-	pthread_mutex_lock(&pdata->data->dlock);
-	if (pdata->eatcnt == pdata->data->mealnum)
-		pdata->data->finished++;
-	pthread_mutex_unlock(&pdata->data->dlock);
-	pthread_mutex_unlock(&pdata->plock);
 	return (0);
 }
 
@@ -123,7 +132,7 @@ int	ft_sleeping(t_philo *pdata)
 	long	sleep;
 
 	sleep = 0;
-	if (!pdata || ft_selfcheck(pdata, 0))
+	if (!pdata || ft_selfcheck(pdata, 1))
 		return (1);
 	if (ft_printmsg(pdata, "is sleeping", 0))
 		return (1);
