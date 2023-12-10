@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 19:34:50 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/12/08 18:45:59 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/10 17:51:59 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ t_data	*ft_parsing(int ac, char **av);
 
 //philo_action
 int		ft_selfcheck(t_philo *pdata, int eat);
+int		ft_hypersleep(t_philo *pdata, long	act_time, long start, int eat);
 int		ft_eating(t_philo *pdata);
 int		ft_sleeping(t_philo *pdata);
 

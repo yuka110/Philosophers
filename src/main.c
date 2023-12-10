@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 19:41:05 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/12/08 22:43:50 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/10 18:00:56 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int	ft_alone(t_philo *pdata, int pnum)
 		return (1);
 	}
 	while (!ft_selfcheck(pdata, 0))
-		usleep(500);
+		usleep(300);
 	pthread_mutex_unlock(&pdata->data->chopstick[pdata->r_chop]);
 	return (1);
 }
@@ -41,7 +41,7 @@ void	*ft_routine(void *arg)
 	if (ft_printmsg(pdata, "is thinking", 0))
 		return (NULL);
 	if (!(pdata->id % 2))
-		usleep (500 * pdata->data->pnum);
+		ft_hypersleep (pdata, (50 * pdata->data->pnum), ft_gettime(pdata->data) - pdata->data->s_time, 0);
 	while (!ft_selfcheck(pdata, 0))
 	{
 		if (ft_eating(pdata))
@@ -62,7 +62,6 @@ int	ft_monitorphilo(t_data *data)
 	i = 0;
 	while (i < data->pnum)
 	{
-		// if (!(i % 5))
 		curr = ft_gettime(data);
 		pthread_mutex_lock(&data->pdata[i].l_eatlock);
 		if (curr > data->pdata[i].last_eat + data->time_die)
@@ -70,10 +69,10 @@ int	ft_monitorphilo(t_data *data)
 			pthread_mutex_unlock(&data->pdata[i].l_eatlock);
 			pthread_mutex_lock(&data->deadlock);
 			data->dead = data->pdata[i].id + 1;
-			pthread_mutex_lock(&data->writing);
-			printf ("%ld %d died\n", ft_gettime(data) / 1000, data->dead);
-			pthread_mutex_unlock(&data->writing);
 			pthread_mutex_unlock(&data->deadlock);
+			pthread_mutex_lock(&data->writing);
+			printf ("%ld %d died\n", ft_gettime(data) / 1000, data->pdata[i].id + 1);
+			pthread_mutex_unlock(&data->writing);
 			return (1);
 		}
 		pthread_mutex_unlock(&data->pdata[i].l_eatlock);
