@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/11/07 18:12:40 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/12/10 15:50:57 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/11 21:08:34 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,10 +79,11 @@ t_data	*ft_parsing(int ac, char **av)
 	}
 	ft_initdata(data);
 	ft_initphilo(data);
-	printf("\e[1;35mphilo num = %d\e[0;00m\n", data->pnum);
-	printf("\e[1;35mtime die = %ld\e[0;00m\n", data->time_die);
-	printf("\e[1;35mtime eat = %ld\e[0;00m\n", data->time_eat);
-	printf("\e[1;35mtime sleep = %ld\e[0;00m\n", data->time_sleep);
-	printf("\e[1;35mmeal num= %d\e[0;00m\n", data->mealnum);
 	return (data);
 }
+
+	// printf("\e[1;35mphilo num = %d\e[0;00m\n", data->pnum);
+	// printf("\e[1;35mtime die = %ld\e[0;00m\n", data->time_die);
+	// printf("\e[1;35mtime eat = %ld\e[0;00m\n", data->time_eat);
+	// printf("\e[1;35mtime sleep = %ld\e[0;00m\n", data->time_sleep);
+	// printf("\e[1;35mmeal num= %d\e[0;00m\n", data->mealnum);

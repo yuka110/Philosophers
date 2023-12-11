@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 20:22:06 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/12/08 18:50:24 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/11 21:24:04 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,22 +61,12 @@ long	ft_gettime(t_data *data)
 	return (microsec);
 }
 
-int	ft_printmsg(t_philo *pdata, char *msg, int eat)
+int	ft_printmsg(t_philo *pdata, char *msg)
 {
-	unsigned long	time;
-
-	if (ft_selfcheck(pdata, 0))
-		return (1);
 	pthread_mutex_lock(&pdata->data->writing);
-	time = ft_gettime(pdata->data) / 1000;
-	printf ("%ld %d ", time, pdata->id + 1);
-	printf ("%s\n", msg);
+	if (ft_selfcheck(pdata, 0))
+		return (pthread_mutex_unlock(&pdata->data->writing), 1);
+	printf("%ld %d %s", ft_gettime(pdata->data) / 1000, pdata->id + 1, msg);
 	pthread_mutex_unlock(&pdata->data->writing);
-	if (eat == 1)
-	{
-		pthread_mutex_lock(&pdata->l_eatlock);
-		pdata->last_eat = time;
-		pthread_mutex_unlock(&pdata->l_eatlock);
-	}
 	return (0);
 }
