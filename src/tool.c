@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 20:22:06 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/12/11 21:24:04 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/12 20:11:31 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ int	ft_printmsg(t_philo *pdata, char *msg)
 	pthread_mutex_lock(&pdata->data->writing);
 	if (ft_selfcheck(pdata, 0))
 		return (pthread_mutex_unlock(&pdata->data->writing), 1);
-	printf("%ld %d %s", ft_gettime(pdata->data) / 1000, pdata->id + 1, msg);
+	printf("%ld %d %s\n", ft_gettime(pdata->data) / 1000, pdata->id + 1, msg);
 	pthread_mutex_unlock(&pdata->data->writing);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 19:41:05 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/12/11 21:25:24 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/12 21:05:51 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,97 +53,41 @@ void	*ft_routine(void *arg)
 	return (NULL);
 }
 
-int	ft_monitorphilo(t_data *data)
+void	ft_threadjoin(t_data *data)
 {
 	int	i;
 
 	i = 0;
 	while (i < data->pnum)
 	{
-		pthread_mutex_lock(&data->pdata[i].l_eatlock);
-		if (ft_gettime(data) > data->pdata[i].last_eat + data->time_die)
-		{
-			pthread_mutex_unlock(&data->pdata[i].l_eatlock);
-			pthread_mutex_lock(&data->deadlock);
-			data->dead = data->pdata[i].id + 1;
-			pthread_mutex_unlock(&data->deadlock);
-			pthread_mutex_lock(&data->writing);
-			printf ("%ld %d died\n", ft_gettime(data) / 1000, data->pdata[i].id + 1);
-			pthread_mutex_unlock(&data->writing);
-			return (1);
-		}
-		pthread_mutex_unlock(&data->pdata[i].l_eatlock);
+		if (pthread_join(data->philo[i], NULL))
+			return ;
 		i++;
 	}
-	return (0);
+	pthread_join(data->monitor, NULL);
 }
 
-
-void	*ft_monitor(void *arg)
+int	main(int argc, char **argv)
 {
 	t_data	*data;
+	int		i;
 
-	data = (t_data *)arg;
-	pthread_mutex_lock(&data->start);
-	pthread_mutex_unlock(&data->start);
-	while (1)
-	{
-		pthread_mutex_lock(&data->deadlock);
-		if (data->dead)
-		{
-			//lock order inversion here
-			pthread_mutex_lock(&data->writing);
-			printf ("%ld %d died\n", ft_gettime(data) / 1000, data->dead);
-			pthread_mutex_unlock(&data->writing);
-			pthread_mutex_unlock(&data->deadlock);
-			break ;
-		}
-		pthread_mutex_lock(&data->dlock);
-		if (data->finished == data->pnum)
-		{
-			pthread_mutex_unlock(&data->dlock);
-			data->dead = 1;
-			pthread_mutex_unlock(&data->deadlock);
-			break ;
-		}
-		pthread_mutex_unlock(&data->dlock);
-		pthread_mutex_unlock(&data->deadlock);
-		if (ft_monitorphilo(data))
-			break ;
-		usleep(500);
-	}
-	return (0);
-}
-
-//protect thread
-int main(int argc, char **argv)
-{
-	t_data	*data;
-	int		id;
-
-	id = 0;
-	if (! (argc == 5 || argc == 6))
-		return (0);
+	i = 0;
 	data = ft_parsing(argc, argv);
 	if (!data)
 		return (0);
 	pthread_mutex_lock(&data->start);
-	while (id < data->pnum)
+	while (i < data->pnum)
 	{
-		pthread_create(&data->philo[id], NULL, ft_routine, &data->pdata[id]);
-		id++;
+		if (pthread_create(&data->philo[i], NULL, ft_routine, &data->pdata[i]))
+			return (ft_cleanthread(data, i), 0);
+		i++;
 	}
-	pthread_create(&data->monitor, NULL, ft_monitor, data);
+	if (pthread_create(&data->monitor, NULL, ft_monitor, data))
+		return (ft_cleanthread(data, i - 1), 0);
 	data->s_time = ft_gettime(data);
 	pthread_mutex_unlock(&data->start);
-
-	id = 0;
-	while (id < data->pnum)
-	{
-		pthread_join(data->philo[id], NULL);
-		id++;
-	}
-	pthread_join(data->monitor, NULL);
-	ft_cleanup(data);
+	ft_threadjoin(data);
+	ft_cleanup(data, data->pnum);
 	return (0);
 }

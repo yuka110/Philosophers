@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/11/07 18:12:40 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/12/11 21:08:34 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/12 20:32:42 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ void	ft_initphilo(t_data *data)
 	}
 }
 
-
 void	ft_initdata(t_data *data)
 {
 	data->philo = (pthread_t *)ft_calloc(sizeof(pthread_t), data->pnum);
@@ -60,6 +59,8 @@ t_data	*ft_parsing(int ac, char **av)
 {
 	t_data	*data;
 
+	if (!(ac == 5 || ac == 6))
+		return (NULL);
 	data = ft_calloc(1, sizeof(t_data));
 	if (!data)
 		return (NULL);
@@ -81,9 +82,3 @@ t_data	*ft_parsing(int ac, char **av)
 	ft_initphilo(data);
 	return (data);
 }
-
-	// printf("\e[1;35mphilo num = %d\e[0;00m\n", data->pnum);
-	// printf("\e[1;35mtime die = %ld\e[0;00m\n", data->time_die);
-	// printf("\e[1;35mtime eat = %ld\e[0;00m\n", data->time_eat);
-	// printf("\e[1;35mtime sleep = %ld\e[0;00m\n", data->time_sleep);
-	// printf("\e[1;35mmeal num= %d\e[0;00m\n", data->mealnum);

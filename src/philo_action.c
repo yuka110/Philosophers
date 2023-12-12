@@ -6,36 +6,11 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/11/22 18:53:50 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/12/11 21:17:32 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/12 21:17:30 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philosophers.h"
-
-int	ft_selfcheck(t_philo *pdata, int eat)
-{
-	pthread_mutex_lock(&pdata->data->deadlock);
-	if (pdata->data->dead)
-	{
-		pthread_mutex_unlock(&pdata->data->deadlock);
-		return (1);
-	}
-	pthread_mutex_unlock(&pdata->data->deadlock);
-	if (!eat)
-	{
-		pthread_mutex_lock(&pdata->l_eatlock);
-		if (ft_gettime(pdata->data) > pdata->last_eat + pdata->data->time_die)
-		{
-			pthread_mutex_unlock(&pdata->l_eatlock);
-			pthread_mutex_lock(&pdata->data->deadlock);
-			pdata->data->dead = pdata->id + 1;
-			pthread_mutex_unlock(&pdata->data->deadlock);
-			return (1);
-		}
-		pthread_mutex_unlock(&pdata->l_eatlock);
-	}
-	return (0);
-}
 
 int	ft_hypersleep(t_philo *pdata, long act_time, long start, int eat)
 {
@@ -91,12 +66,10 @@ int	ft_starving(t_data *data, t_philo *pdata)
 	waittime = data->time_eat / 2;
 	if (data->pnum % 2)
 		waittime = waittime * 2;
-	start = ft_gettime(pdata->data) - start;
-	if (ft_hypersleep(pdata, waittime, start, 0))
+	if (ft_hypersleep(pdata, waittime, 0, 0))
 		return (1);
 	return (0);
 }
-
 
 int	ft_eating(t_philo *pdata)
 {
@@ -127,8 +100,6 @@ int	ft_sleeping(t_philo *pdata)
 	sleep = 0;
 	if (ft_selfcheck(pdata, 1) || ft_printmsg(pdata, "is sleeping"))
 		return (1);
-	// if (ft_printmsg(pdata, "is sleeping"))
-	// 	return (1);
 	if (ft_hypersleep(pdata, pdata->data->time_sleep, 0, 0))
 		return (1);
 	return (0);

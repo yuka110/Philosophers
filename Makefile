@@ -6,17 +6,18 @@
 #    By: yitoh <yitoh@student.codam.nl>               +#+                      #
 #                                                    +#+                       #
 #    Created: 2023/10/31 19:35:41 by yitoh         #+#    #+#                  #
-#    Updated: 2023/12/11 21:01:44 by yitoh         ########   odam.nl          #
+#    Updated: 2023/12/12 20:59:16 by yitoh         ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	=philo
 CC		=cc
-CFLAGS	=-Wall -Werror -Wextra -g -fsanitize=thread #-flto -O3
+CFLAGS	=-Wall -Werror -Wextra #-g -fsanitize=thread #-flto -O3
 RM		=rm -f
 SRC		=src/main.c\
 		 src/init.c\
 		 src/philo_action.c\
+		 src/monitor.c\
 		 src/cleanup.c\
 		 src/tool.c
 OBJ		=$(SRC:src/%.c=obj/%.o)

@@ -6,7 +6,7 @@
 /*   By: yitoh <yitoh@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/10/31 19:34:50 by yitoh         #+#    #+#                 */
-/*   Updated: 2023/12/11 21:08:16 by yitoh         ########   odam.nl         */
+/*   Updated: 2023/12/12 20:58:58 by yitoh         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,21 +65,23 @@ t_data	*ft_parsing(int ac, char **av);
 
 //philo_action
 int		ft_selfcheck(t_philo *pdata, int eat);
-int		ft_hypersleep(t_philo *pdata, long	act_time, long start, int eat);
+int		ft_hypersleep(t_philo *pdata, long act_time, long start, int eat);
 int		ft_eating(t_philo *pdata);
 int		ft_sleeping(t_philo *pdata);
 
+//monitor
+int		ft_selfcheck(t_philo *pdata, int eat);
+void	*ft_monitor(void *arg);
+
 //cleanup
 void	ft_freedata(t_data *data);
-void	ft_cleanup(t_data *data);
+void	ft_cleanthread(t_data *data, int failed);
+void	ft_cleanup(t_data *data, int i);
 
 // tool
 void	*ft_calloc(size_t count, size_t size);
 int		ft_atoiplus(const char *str);
 long	ft_gettime(t_data *data);
 int		ft_printmsg(t_philo *philo, char *msg);
-
-//test
-// void	*ft_test(void *arg);
 
 #endif
